@@ -1,183 +1,90 @@
 <!doctype html>
 <html lang="de">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Real Life Simulator – Prototype</title>
-  <style>
-    html, body { margin:0; width:100%; height:100%; overflow:hidden; background:#090b0e; font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
-    canvas { display:block; }
-    #hud { position:fixed; inset:0; pointer-events:none; color:#fff; }
-    .panel { position:absolute; left:18px; top:18px; width:min(360px, calc(100vw - 36px)); padding:14px 16px; border-radius:18px; background:rgba(8,10,14,.56); border:1px solid rgba(255,255,255,.12); backdrop-filter:blur(16px); box-shadow:0 18px 60px rgba(0,0,0,.35); }
-    .title { font-size:14px; font-weight:800; letter-spacing:.08em; text-transform:uppercase; opacity:.95; }
-    .sub { margin-top:6px; font-size:12px; line-height:1.45; opacity:.72; }
-    .row { display:flex; gap:8px; flex-wrap:wrap; margin-top:10px; }
-    .chip { padding:7px 9px; border-radius:10px; background:rgba(255,255,255,.07); border:1px solid rgba(255,255,255,.08); font-size:11px; }
-    #speed { position:absolute; right:22px; bottom:20px; min-width:160px; text-align:right; font-size:16px; text-shadow:0 2px 10px #000; }
-    #speed strong { font-size:44px; line-height:.9; }
-    #centerHint { position:absolute; left:50%; bottom:60px; transform:translateX(-50%); padding:10px 14px; border-radius:14px; background:rgba(8,10,14,.55); border:1px solid rgba(255,255,255,.1); backdrop-filter: blur(10px); font-size:12px; opacity:.9; }
-    #reticle { position:absolute; left:50%; top:50%; width:6px; height:6px; transform:translate(-50%,-50%); border-radius:50%; background:#fff; box-shadow:0 0 0 4px rgba(255,255,255,.12); opacity:.8; }
-    #minimap { position:absolute; right:18px; top:18px; width:170px; height:170px; border-radius:20px; background:rgba(8,10,14,.55); border:1px solid rgba(255,255,255,.12); backdrop-filter:blur(14px); overflow:hidden; }
-    #miniCanvas{width:100%;height:100%;display:block;}
-    #weather { position:absolute; left:18px; bottom:18px; font-size:12px; opacity:.75; }
-    @media (max-width:720px){ .panel{width:250px}.sub{display:none} #minimap{width:120px;height:120px} #speed strong{font-size:34px} }
-  </style>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Life Simulator – Prototype 02</title>
+<style>
+html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#0b0d10;font-family:Inter,system-ui,-apple-system,Segoe UI,sans-serif}canvas{display:block}
+#hud{position:fixed;inset:0;pointer-events:none;color:#fff}.glass{background:rgba(10,12,16,.62);border:1px solid rgba(255,255,255,.12);backdrop-filter:blur(14px);box-shadow:0 16px 50px rgba(0,0,0,.35)}
+#top{position:absolute;left:16px;top:16px;padding:12px 14px;border-radius:16px;min-width:290px}.kicker{font-size:11px;letter-spacing:.12em;text-transform:uppercase;opacity:.7}.big{font-size:18px;font-weight:800;margin-top:3px}.meta{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px}.chip{font-size:11px;padding:6px 8px;border-radius:9px;background:rgba(255,255,255,.07)}
+#task{position:absolute;left:16px;bottom:16px;padding:12px 14px;border-radius:16px;width:min(390px,calc(100vw - 32px))}.taskTitle{font-weight:800}.taskText{font-size:12px;opacity:.8;margin-top:5px;line-height:1.4}.progress{height:6px;background:rgba(255,255,255,.1);border-radius:99px;margin-top:9px;overflow:hidden}.bar{height:100%;width:0%;background:#fff}
+#hint{position:absolute;left:50%;bottom:55px;transform:translateX(-50%);padding:9px 12px;border-radius:12px;font-size:12px}.hide{display:none}
+#money{position:absolute;right:18px;bottom:18px;text-align:right}.money{font-size:27px;font-weight:800}.small{font-size:11px;opacity:.7}
+#stage{position:absolute;right:18px;top:18px;padding:10px 12px;border-radius:14px;text-align:right;min-width:150px}
+#panel{position:absolute;right:18px;top:105px;width:260px;border-radius:16px;padding:12px 14px;display:none;pointer-events:none}.panelTitle{font-weight:800;margin-bottom:7px}.line{font-size:12px;padding:6px 0;border-bottom:1px solid rgba(255,255,255,.08)}
+#reticle{position:absolute;left:50%;top:50%;width:5px;height:5px;border-radius:50%;background:#fff;transform:translate(-50%,-50%);opacity:.7}
+@media(max-width:700px){#top{min-width:220px}.big{font-size:15px}#stage{display:none}#panel{display:none!important}}
+</style>
 </head>
 <body>
 <div id="hud">
-  <div class="panel">
-    <div class="title">REAL LIFE SIMULATOR · PROTOTYPE 01</div>
-    <div class="sub">Kleine offene Stadt als technische Basis. Erst laufen, dann zum Auto gehen und mit <b>E</b> einsteigen.</div>
-    <div class="row">
-      <div class="chip">WASD · bewegen</div><div class="chip">Shift · schneller</div><div class="chip">E · Auto</div><div class="chip">R · Regen</div><div class="chip">N · Tag/Nacht</div>
-    </div>
-  </div>
-  <div id="minimap"><canvas id="miniCanvas" width="340" height="340"></canvas></div>
-  <div id="centerHint">Klicke ins Spiel, um die Maus zu steuern</div>
+  <div id="top" class="glass"><div class="kicker">LIFE SIMULATOR · PROTOTYPE 02</div><div class="big" id="lifeTitle">Geburt · Zuhause</div><div class="meta"><div class="chip" id="ageChip">Alter: 0</div><div class="chip" id="jobChip">Beruf: –</div><div class="chip" id="homeChip">Zuhause: Elternhaus</div></div></div>
+  <div id="stage" class="glass"><div class="small">LEBENSPHASE</div><div class="big" id="stageName">Baby</div></div>
+  <div id="panel" class="glass"><div class="panelTitle" id="panelTitle">Info</div><div id="panelBody"></div></div>
+  <div id="task" class="glass"><div class="taskTitle" id="taskTitle">Deine erste Aufgabe</div><div class="taskText" id="taskText">Schau zu deiner Mutter und gehe näher zu ihr.</div><div class="progress"><div class="bar" id="taskBar"></div></div></div>
+  <div id="hint" class="glass">Klicke ins Spiel · WASD bewegen · E interagieren</div>
+  <div id="money"><div class="money" id="moneyText">0,00 €</div><div class="small">KONTO</div></div>
   <div id="reticle"></div>
-  <div id="speed"><span id="mode">ZU FUSS</span><br><strong id="speedNum">0</strong> <span>km/h</span></div>
-  <div id="weather">Trocken · 18°C</div>
 </div>
-<script type="importmap">
-{"imports":{"three":"https://unpkg.com/three@0.168.0/build/three.module.js","three/addons/":"https://unpkg.com/three@0.168.0/examples/jsm/"}}
-</script>
+<script type="importmap">{"imports":{"three":"https://unpkg.com/three@0.168.0/build/three.module.js","three/addons/":"https://unpkg.com/three@0.168.0/examples/jsm/"}}</script>
 <script type="module">
 import * as THREE from 'three';
 import { PointerLockControls } from 'three/addons/controls/PointerLockControls.js';
-
-const scene = new THREE.Scene();
-scene.background = new THREE.Color(0x9eb3c6);
-scene.fog = new THREE.FogExp2(0xaab9c6, 0.0024);
-
-const camera = new THREE.PerspectiveCamera(68, innerWidth/innerHeight, 0.08, 1300);
-camera.position.set(0, 1.7, 8);
-const renderer = new THREE.WebGLRenderer({antialias:true, powerPreference:'high-performance'});
-renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
-renderer.setSize(innerWidth, innerHeight);
-renderer.shadowMap.enabled = true;
-renderer.shadowMap.type = THREE.PCFSoftShadowMap;
-renderer.toneMapping = THREE.ACESFilmicToneMapping;
-renderer.toneMappingExposure = 1.15;
-renderer.outputColorSpace = THREE.SRGBColorSpace;
-document.body.appendChild(renderer.domElement);
-
-const hemi = new THREE.HemisphereLight(0xddeeff, 0x4b4a42, 1.55); scene.add(hemi);
-const sun = new THREE.DirectionalLight(0xfff1d1, 4.0); sun.position.set(130,180,90); sun.castShadow=true; sun.shadow.mapSize.set(2048,2048); sun.shadow.camera.left=-180; sun.shadow.camera.right=180; sun.shadow.camera.top=180; sun.shadow.camera.bottom=-180; scene.add(sun);
-
-const world = new THREE.Group(); scene.add(world);
-const asphalt = new THREE.MeshStandardMaterial({color:0x303338, roughness:.91, metalness:.02});
-const sidewalkMat = new THREE.MeshStandardMaterial({color:0x8f9292, roughness:.95});
-const grassMat = new THREE.MeshStandardMaterial({color:0x657352, roughness:1});
-const lineMat = new THREE.MeshStandardMaterial({color:0xded9c8, roughness:.8});
-const curbMat = new THREE.MeshStandardMaterial({color:0xbab7ae, roughness:.98});
-
-const ground = new THREE.Mesh(new THREE.PlaneGeometry(900,900), grassMat); ground.rotation.x=-Math.PI/2; ground.receiveShadow=true; world.add(ground);
-
-function box(w,h,d,mat,x,y,z,cast=true){ const m=new THREE.Mesh(new THREE.BoxGeometry(w,h,d),mat); m.position.set(x,y,z); m.castShadow=cast; m.receiveShadow=true; world.add(m); return m; }
-function road(x,z,w,d){ box(w,.05,d,asphalt,x,.025,z,false); }
-function stripe(x,z,w,d){ box(w,.012,d,lineMat,x,.065,z,false); }
-
-// Road grid
-for(let x=-180;x<=180;x+=90){ road(x,0,18,420); for(let z=-190;z<=190;z+=12){ stripe(x,z,.22,4.2); } box(4,.16,420,sidewalkMat,x-11,.08,0,false); box(4,.16,420,sidewalkMat,x+11,.08,0,false); }
-for(let z=-180;z<=180;z+=90){ road(0,z,420,18); for(let x=-190;x<=190;x+=12){ stripe(x,z,4.2,.22); } box(420,.16,4,sidewalkMat,0,.08,z-11,false); box(420,.16,4,sidewalkMat,0,.08,z+11,false); }
-
-// Buildings
-const buildingMats=[0x6f7479,0x8b8175,0x747b6c,0x8d8f93,0x726b65,0x9c9288].map(c=>new THREE.MeshStandardMaterial({color:c,roughness:.86}));
-const windowMat = new THREE.MeshStandardMaterial({color:0x9cc1d4,roughness:.2,metalness:.25,emissive:0x16242d, emissiveIntensity:.18});
-function building(x,z,w,d,h,mat){
-  const b=box(w,h,d,mat,x,h/2,z);
-  // windows simplified
-  const floors=Math.max(2,Math.floor(h/4)); const cols=Math.max(2,Math.floor(w/5));
-  for(let fy=0;fy<floors;fy++) for(let cx=0;cx<cols;cx++){
-    const wx=x-w/2+3+cx*(w-6)/Math.max(1,cols-1); const wy=2.3+fy*3.6;
-    const win=new THREE.Mesh(new THREE.PlaneGeometry(1.35,1.7),windowMat); win.position.set(wx,wy,z+d/2+.011); world.add(win);
-  }
-  return b;
-}
-const blocks=[];
-for(let gx=-135;gx<=135;gx+=90){ for(let gz=-135;gz<=135;gz+=90){
-  const corners=[[gx-22,gz-22],[gx+22,gz-22],[gx-22,gz+22],[gx+22,gz+22]];
-  corners.forEach((p,i)=>{ const h=14+((Math.abs(gx*13+gz*7+i*31))%28); blocks.push(building(p[0],p[1],28,28,h,buildingMats[(i+Math.abs(gx+gz))%buildingMats.length])); });
-}}
-
-// Trees + street lamps
-const trunkMat=new THREE.MeshStandardMaterial({color:0x59442f,roughness:1}); const leafMat=new THREE.MeshStandardMaterial({color:0x3c5940,roughness:1});
-for(let x=-170;x<=170;x+=30){ for(const z of [-72,72,162,-162]){ if(Math.abs(x)%90<14) continue; const t=box(.6,4,.6,trunkMat,x,2,z); const crown=new THREE.Mesh(new THREE.SphereGeometry(2.4,9,7),leafMat); crown.position.set(x,5,z); crown.castShadow=true; world.add(crown);} }
-const lampMat=new THREE.MeshStandardMaterial({color:0x25282b,roughness:.55,metalness:.55}); const bulbMat=new THREE.MeshStandardMaterial({color:0xffe7b4,emissive:0xffd27a,emissiveIntensity:0});
-const bulbs=[];
-for(let z=-180;z<=180;z+=45){ for(const x of [-12,12,78,102,-78,-102]){ const pole=box(.18,6,.18,lampMat,x,3,z); const arm=box(1.3,.12,.12,lampMat,x+(x>0?-.55:.55),5.8,z); const bulb=box(.5,.16,.32,bulbMat,x+(x>0?-1.1:1.1),5.65,z); bulbs.push(bulb); }}
-
-// Player visual marker
-const player = new THREE.Object3D(); player.position.set(6,0,14); scene.add(player);
-
-// Car
-const car = new THREE.Group();
-const carBodyMat=new THREE.MeshPhysicalMaterial({color:0x1b1d20,metalness:.72,roughness:.2,clearcoat:1,clearcoatRoughness:.12});
-const glassMat=new THREE.MeshPhysicalMaterial({color:0x19252d,transparent:true,opacity:.58,roughness:.08,metalness:.2});
-const body=new THREE.Mesh(new THREE.BoxGeometry(2.05,.62,4.45),carBodyMat); body.position.y=.7; body.castShadow=true; car.add(body);
-const cabin=new THREE.Mesh(new THREE.BoxGeometry(1.78,.7,2.15),glassMat); cabin.position.set(0,1.18,-.12); cabin.castShadow=true; car.add(cabin);
-const wheelMat=new THREE.MeshStandardMaterial({color:0x111111,roughness:.9});
-for(const sx of [-1,1]) for(const sz of [-1.45,1.45]){ const wh=new THREE.Mesh(new THREE.CylinderGeometry(.42,.42,.26,18),wheelMat); wh.rotation.z=Math.PI/2; wh.position.set(sx*.96,.43,sz); wh.castShadow=true; car.add(wh); }
-const lightFront=new THREE.MeshStandardMaterial({color:0xf6f2d6,emissive:0xffefb8,emissiveIntensity:1.6});
-for(const x of [-.68,.68]){ const l=new THREE.Mesh(new THREE.BoxGeometry(.42,.18,.06),lightFront); l.position.set(x,.77,-2.24); car.add(l); }
-car.position.set(4,0,-7); world.add(car);
-
-// NPC traffic
-const npcCars=[];
-const colors=[0xb7483f,0x496c8a,0xc4c1b9,0x34373c,0x8b6f4c,0x4e7355];
-for(let i=0;i<18;i++){
-  const g=new THREE.Group(); const mat=new THREE.MeshPhysicalMaterial({color:colors[i%colors.length],metalness:.55,roughness:.28,clearcoat:.7});
-  const b=new THREE.Mesh(new THREE.BoxGeometry(1.8,.55,3.8),mat); b.position.y=.55; b.castShadow=true; g.add(b);
-  const c=new THREE.Mesh(new THREE.BoxGeometry(1.5,.55,1.8),glassMat); c.position.set(0,1,-.15); g.add(c);
-  const lane=(i%4); if(lane===0){g.position.set(-4.5,0,-180+i*20);g.userData={axis:'z',dir:1,speed:7+(i%5)}}
-  if(lane===1){g.position.set(4.5,0,180-i*22);g.rotation.y=Math.PI;g.userData={axis:'z',dir:-1,speed:8+(i%4)}}
-  if(lane===2){g.position.set(-180+i*23,0,85.5);g.rotation.y=-Math.PI/2;g.userData={axis:'x',dir:1,speed:6+(i%6)}}
-  if(lane===3){g.position.set(180-i*21,0,94.5);g.rotation.y=Math.PI/2;g.userData={axis:'x',dir:-1,speed:7+(i%5)}}
-  npcCars.push(g); world.add(g);
-}
-
-// Rain
-const rainCount=1800; const rainGeo=new THREE.BufferGeometry(); const rainPos=new Float32Array(rainCount*3);
-for(let i=0;i<rainCount;i++){ rainPos[i*3]=(Math.random()-.5)*180; rainPos[i*3+1]=Math.random()*70; rainPos[i*3+2]=(Math.random()-.5)*180; }
-rainGeo.setAttribute('position',new THREE.BufferAttribute(rainPos,3));
-const rainMat=new THREE.PointsMaterial({color:0xcad8e8,size:.075,transparent:true,opacity:.55}); const rain=new THREE.Points(rainGeo,rainMat); rain.visible=false; scene.add(rain);
-
-const controls=new PointerLockControls(camera, renderer.domElement);
-renderer.domElement.addEventListener('click',()=>{ if(!controls.isLocked && !driving) controls.lock(); });
-controls.addEventListener('lock',()=>document.getElementById('centerHint').style.display='none');
-controls.addEventListener('unlock',()=>{ if(!driving) document.getElementById('centerHint').style.display='block'; });
-
-const keys={}; addEventListener('keydown',e=>{ keys[e.code]=true; if(e.code==='KeyE'&&!e.repeat) toggleCar(); if(e.code==='KeyR'&&!e.repeat) toggleRain(); if(e.code==='KeyN'&&!e.repeat) toggleNight(); }); addEventListener('keyup',e=>keys[e.code]=false);
-let driving=false, carSpeed=0, steer=0, night=false, raining=false;
-function toggleCar(){
-  if(!driving){ if(camera.position.distanceTo(car.position)<6.5){ driving=true; controls.unlock(); document.getElementById('mode').textContent='FAHRT'; document.getElementById('centerHint').textContent='E · aussteigen'; document.getElementById('centerHint').style.display='block'; } }
-  else { driving=false; camera.position.copy(car.position).add(new THREE.Vector3(3,1.7,0)); player.position.copy(camera.position); document.getElementById('mode').textContent='ZU FUSS'; document.getElementById('centerHint').textContent='Klicke ins Spiel, um die Maus zu steuern'; }
-}
-function toggleRain(){ raining=!raining; rain.visible=raining; document.getElementById('weather').textContent=raining?'Regen · 15°C':'Trocken · 18°C'; if(raining){ scene.fog.density=.0036; asphalt.roughness=.48; renderer.toneMappingExposure=.95;} else {scene.fog.density=.0024; asphalt.roughness=.91; renderer.toneMappingExposure=night?.62:1.15;} }
-function toggleNight(){ night=!night; if(night){ scene.background.set(0x0a1020); hemi.intensity=.24; sun.intensity=.1; bulbMat.emissiveIntensity=3.4; renderer.toneMappingExposure=.62; scene.fog.color.set(0x121826); } else { scene.background.set(0x9eb3c6); hemi.intensity=1.55; sun.intensity=4; bulbMat.emissiveIntensity=0; renderer.toneMappingExposure=raining?.95:1.15; scene.fog.color.set(0xaab9c6); } }
-
-const clock=new THREE.Clock(); const v=new THREE.Vector3(); const forward=new THREE.Vector3(); const right=new THREE.Vector3();
-function updateWalk(dt){
-  if(!controls.isLocked) return;
-  const speed=(keys.ShiftLeft?9.5:5.2)*dt;
-  camera.getWorldDirection(forward); forward.y=0; forward.normalize(); right.crossVectors(forward,new THREE.Vector3(0,1,0)).normalize();
-  v.set(0,0,0); if(keys.KeyW)v.add(forward); if(keys.KeyS)v.sub(forward); if(keys.KeyD)v.add(right); if(keys.KeyA)v.sub(right); if(v.lengthSq())v.normalize().multiplyScalar(speed); camera.position.add(v); camera.position.y=1.7; player.position.copy(camera.position);
-}
-function updateCar(dt){
-  const accel=keys.KeyW?18:(keys.KeyS?-14:0); const brake=(!keys.KeyW&&!keys.KeyS)?2.8:0; carSpeed+=accel*dt; if(brake){ const s=Math.sign(carSpeed); carSpeed-=s*Math.min(Math.abs(carSpeed),brake*dt); } carSpeed=Math.max(-11,Math.min(34,carSpeed));
-  const targetSteer=(keys.KeyA?1:0)+(keys.KeyD?-1:0); steer=THREE.MathUtils.lerp(steer,targetSteer,1-Math.pow(.002,dt)); if(Math.abs(carSpeed)>.15) car.rotation.y += steer*dt*(carSpeed/17)*1.5;
-  forward.set(0,0,-1).applyQuaternion(car.quaternion); car.position.addScaledVector(forward,carSpeed*dt);
-  const camTarget=car.position.clone().add(new THREE.Vector3(0,1.25,0)); const behind=new THREE.Vector3(0,3.1,8.5).applyQuaternion(car.quaternion).add(car.position); camera.position.lerp(behind,1-Math.pow(.00008,dt)); camera.lookAt(camTarget);
-}
-function updateNPC(dt){ for(const g of npcCars){ const u=g.userData; g.position[u.axis]+=u.dir*u.speed*dt; if(g.position[u.axis]>205)g.position[u.axis]=-205; if(g.position[u.axis]<-205)g.position[u.axis]=205; } }
-function updateRain(dt){ if(!raining)return; const p=rainGeo.attributes.position.array; for(let i=0;i<rainCount;i++){ p[i*3+1]-=42*dt; if(p[i*3+1]<0)p[i*3+1]=65+Math.random()*10; p[i*3]+=0.9*dt; } rainGeo.attributes.position.needsUpdate=true; rain.position.set(camera.position.x,0,camera.position.z); }
-
-const mini=document.getElementById('miniCanvas'), ctx=mini.getContext('2d');
-function drawMap(){ const W=mini.width,H=mini.height,s=W/440; ctx.clearRect(0,0,W,H); ctx.fillStyle='#182022';ctx.fillRect(0,0,W,H); ctx.strokeStyle='#51585d';ctx.lineWidth=14*s; for(let k=-180;k<=180;k+=90){ctx.beginPath();ctx.moveTo(W/2+k*s,0);ctx.lineTo(W/2+k*s,H);ctx.stroke();ctx.beginPath();ctx.moveTo(0,H/2+k*s);ctx.lineTo(W,H/2+k*s);ctx.stroke();} const pos=driving?car.position:camera.position; ctx.fillStyle='#fff';ctx.beginPath();ctx.arc(W/2+pos.x*s,H/2+pos.z*s,6,0,Math.PI*2);ctx.fill(); ctx.fillStyle='#cf3f3f';ctx.beginPath();ctx.arc(W/2+car.position.x*s,H/2+car.position.z*s,5,0,Math.PI*2);ctx.fill(); }
-
-function animate(){ requestAnimationFrame(animate); const dt=Math.min(clock.getDelta(),.04); if(driving)updateCar(dt); else updateWalk(dt); updateNPC(dt); updateRain(dt); drawMap(); document.getElementById('speedNum').textContent=driving?Math.round(Math.abs(carSpeed)*3.6):Math.round(v.length()/Math.max(dt,.001)*3.6); renderer.render(scene,camera); }
-animate();
-addEventListener('resize',()=>{camera.aspect=innerWidth/innerHeight;camera.updateProjectionMatrix();renderer.setSize(innerWidth,innerHeight);});
+const scene=new THREE.Scene();scene.background=new THREE.Color(0xa9b7c1);scene.fog=new THREE.FogExp2(0xa9b7c1,.0022);
+const camera=new THREE.PerspectiveCamera(68,innerWidth/innerHeight,.08,1200);camera.position.set(0,1.1,5);
+const renderer=new THREE.WebGLRenderer({antialias:true,powerPreference:'high-performance'});renderer.setSize(innerWidth,innerHeight);renderer.setPixelRatio(Math.min(devicePixelRatio,2));renderer.shadowMap.enabled=true;renderer.shadowMap.type=THREE.PCFSoftShadowMap;renderer.toneMapping=THREE.ACESFilmicToneMapping;renderer.toneMappingExposure=1.1;renderer.outputColorSpace=THREE.SRGBColorSpace;document.body.appendChild(renderer.domElement);
+scene.add(new THREE.HemisphereLight(0xe8f0ff,0x5d564c,1.5));const sun=new THREE.DirectionalLight(0xfff3d9,3.5);sun.position.set(90,150,80);sun.castShadow=true;sun.shadow.mapSize.set(2048,2048);scene.add(sun);
+const world=new THREE.Group();scene.add(world);
+function mat(c,r=.8,m=0){return new THREE.MeshStandardMaterial({color:c,roughness:r,metalness:m})}function box(w,h,d,ma,x,y,z,grp=world){const o=new THREE.Mesh(new THREE.BoxGeometry(w,h,d),ma);o.position.set(x,y,z);o.castShadow=true;o.receiveShadow=true;grp.add(o);return o}
+const grass=mat(0x5d714e,1),asphalt=mat(0x2e3033,.93),side=mat(0x9c9d99,.95),wall=mat(0xd8d1c8,.95),roof=mat(0x42464a,.8),glass=new THREE.MeshPhysicalMaterial({color:0x7fa3b6,transparent:true,opacity:.55,roughness:.12,metalness:.15});
+const ground=new THREE.Mesh(new THREE.PlaneGeometry(700,700),grass);ground.rotation.x=-Math.PI/2;ground.receiveShadow=true;world.add(ground);
+for(let x=-160;x<=160;x+=80){box(16,.05,360,asphalt,x,.025,0);box(3,.13,360,side,x-9.5,.065,0);box(3,.13,360,side,x+9.5,.065,0)}for(let z=-160;z<=160;z+=80){box(360,.05,16,asphalt,0,.025,z);box(360,.13,3,side,0,.065,z-9.5);box(360,.13,3,side,0,.065,z+9.5)}
+function building(x,z,w,d,h,c){const g=new THREE.Group();box(w,h,d,mat(c,.88),0,h/2,0,g);for(let yy=3;yy<h-1;yy+=3.8)for(let xx=-w/2+2;xx<w/2-1;xx+=4){const win=new THREE.Mesh(new THREE.PlaneGeometry(1.5,1.8),glass);win.position.set(xx,yy,d/2+.01);g.add(win)}g.position.set(x,0,z);world.add(g);return g}
+for(let x=-120;x<=120;x+=80)for(let z=-120;z<=120;z+=80){if(Math.abs(x)<30&&Math.abs(z)<30)continue;building(x-18,z-18,25,25,15+Math.abs((x+z)%17),0x7c7a74);building(x+18,z+18,27,27,18+Math.abs((x-z)%15),0x8b847b)}
+// Elternhaus
+const home=new THREE.Group();box(22,7,18,wall,0,3.5,0,home);box(24,.7,20,roof,0,7.3,0,home);box(7,2.4,5,glass,0,2.2,9.01,home);box(2.2,3.2,.3,mat(0x5b4637,.7),-6,1.6,9.2,home);home.position.set(30,0,30);world.add(home);
+// Innenraum/Startzimmer angedeutet
+box(8,.5,4,mat(0xf3efe8,1),30,.25,23);box(2,.7,1.1,mat(0xffffff,.9),30,.65,22.4); // Bett/Wiege
+// Personen
+function person(x,z,shirt,name){const g=new THREE.Group();const skin=mat(0xd6a17d,.75);box(.75,1.55,.45,mat(shirt,.8),0,1.25,0,g);const head=new THREE.Mesh(new THREE.SphereGeometry(.32,20,16),skin);head.position.set(0,2.25,0);g.add(head);box(.2,1.1,.2,skin,-.55,1.3,0,g);box(.2,1.1,.2,skin,.55,1.3,0,g);box(.25,1.1,.25,mat(0x34383d,.8),-.22,.35,0,g);box(.25,1.1,.25,mat(0x34383d,.8),.22,.35,0,g);g.position.set(x,0,z);g.userData={type:'person',name};world.add(g);return g}
+const mother=person(27,25,0x8a5665,'Mutter');const father=person(34,25,0x445f7a,'Vater');
+// Shops + workplaces
+const points=[];function poi(name,type,x,z,reward=0){building(x,z,34,24,10,type==='shop'?0x5d6e64:type==='job'?0x646a78:0x7a6b5c);const sign=box(12,1,.35,mat(0xf1eee6,.6),x,6.2,z+12.25);sign.userData={type:'poi',name,kind:type,reward};points.push(sign);return sign}
+poi('Supermarkt','shop',-50,30);poi('Autohaus','shop',-50,-50);poi('Bäckerei','shop',30,-50);poi('Logistikzentrum','job',110,30,95);poi('Krankenhaus','job',110,-50,120);poi('Werkstatt','job',30,110,105);
+// Starter car – i8-inspired
+const car=new THREE.Group();const bodyMat=new THREE.MeshPhysicalMaterial({color:0x111417,metalness:.72,roughness:.18,clearcoat:1,clearcoatRoughness:.08});const accent=mat(0x18d5d0,.25,.45);const tire=mat(0x111111,.95),rim=mat(0x686d72,.28,.75);
+box(2.05,.48,4.45,bodyMat,0,.63,0,car);box(1.78,.42,2.4,bodyMat,0,.95,-.05,car);const wind=new THREE.Mesh(new THREE.BoxGeometry(1.55,.36,1.65),glass);wind.position.set(0,1.28,-.18);car.add(wind);box(2.0,.12,1.2,accent,0,.48,-1.45,car);box(.16,.16,3.25,accent,-.95,.54,.05,car);box(.16,.16,3.25,accent,.95,.54,.05,car);box(1.65,.08,.28,accent,0,.93,2.03,car);
+for(const sx of [-1,1])for(const sz of [-1.45,1.45]){const w=new THREE.Group();const t=new THREE.Mesh(new THREE.CylinderGeometry(.42,.42,.25,24),tire);t.rotation.z=Math.PI/2;w.add(t);const r=new THREE.Mesh(new THREE.CylinderGeometry(.23,.23,.27,12),rim);r.rotation.z=Math.PI/2;w.add(r);w.position.set(sx*.96,.42,sz);car.add(w)}
+car.position.set(39,0,32);car.userData={type:'car',name:'Starterwagen'};world.add(car);
+// systems
+const controls=new PointerLockControls(camera,renderer.domElement);renderer.domElement.onclick=()=>{if(!controls.isLocked&&!driving)controls.lock()};const keys={};addEventListener('keydown',e=>{keys[e.code]=true;if(e.code==='KeyE'&&!e.repeat)interact()});addEventListener('keyup',e=>keys[e.code]=false);
+let age=0,stage='Baby',money=0,job='–',homeName='Elternhaus',taskIndex=0,driving=false,carSpeed=0,steer=0;
+const tasks=[
+ {t:'Schau zu deiner Mutter',d:'Gehe zu deiner Mutter und drücke E.',target:mother,age:0},
+ {t:'Begrüße deinen Vater',d:'Gehe zu deinem Vater und drücke E.',target:father,age:1},
+ {t:'Lerne laufen',d:'Bewege dich ein Stück durch das Haus.',walk:18,age:3},
+ {t:'Erster Schultag',d:'Erreiche die markierte Straße vor dem Elternhaus.',pos:new THREE.Vector3(30,0,8),age:6},
+ {t:'Erster Nebenjob',d:'Gehe zum Logistikzentrum und nimm einen Job an.',poi:'Logistikzentrum',age:16},
+ {t:'Führerschein',d:'Gehe zu deinem Starterwagen und steige mit E ein.',target:car,age:18},
+ {t:'Erster Einkauf',d:'Fahre oder gehe zum Supermarkt und kaufe Lebensmittel.',poi:'Supermarkt',age:18},
+ {t:'Eigenes Geld',d:'Arbeite im Logistikzentrum. Eine Schicht zahlt 95 €.',poi:'Logistikzentrum',age:18},
+ {t:'Eigene Wohnung',d:'Spare 1.200 € und kaufe später deine erste Wohnung.',money:1200,age:19}
+];let walked=0;
+function setAge(a){age=a;stage=a<2?'Baby':a<6?'Kleinkind':a<13?'Kind':a<18?'Jugendlich':'Erwachsen';document.getElementById('ageChip').textContent='Alter: '+a;document.getElementById('stageName').textContent=stage;document.getElementById('lifeTitle').textContent=(a<18?'Familie & Aufwachsen':'Eigenes Leben')+' · Stadt';}
+function setMoney(v){money=v;document.getElementById('moneyText').textContent=money.toLocaleString('de-DE',{minimumFractionDigits:2,maximumFractionDigits:2})+' €'}
+function updateTask(){const t=tasks[Math.min(taskIndex,tasks.length-1)];setAge(Math.max(age,t.age||age));document.getElementById('taskTitle').textContent=t.t;document.getElementById('taskText').textContent=t.d;document.getElementById('taskBar').style.width=((taskIndex/tasks.length)*100)+'%'}
+function done(){if(taskIndex<tasks.length-1){taskIndex++;updateTask()}else{document.getElementById('taskTitle').textContent='Freies Leben';document.getElementById('taskText').textContent='Arbeite, kaufe, verkaufe, fahre durch die Stadt und baue dein Leben aus.';document.getElementById('taskBar').style.width='100%'}}
+function nearest(){let all=[mother,father,car,...points],best=null,dist=999;for(const o of all){const d=camera.position.distanceTo(o.getWorldPosition(new THREE.Vector3()));if(d<dist){best=o;dist=d}}return {o:best,d:dist}}
+function interact(){const n=nearest();if(n.d>5.5)return;const o=n.o;const t=tasks[taskIndex];if(o===car){if(age<18){show('Auto','Du bist noch zu jung. Erst ab 18 kannst du fahren.');return}driving=!driving;if(driving){controls.unlock();show('Starterwagen','Motor gestartet · W/S Gas/Bremse · A/D lenken · E aussteigen');if(t.target===car)done()}else{camera.position.copy(car.position).add(new THREE.Vector3(3,1.7,0));show('Auto','Ausgestiegen.')}return}
+ if(o.userData.type==='person'){show(o.userData.name,o===mother?'Sie kümmert sich um dich und begleitet dich beim Aufwachsen.':'Er unterstützt dich und gibt dir neue Aufgaben.');if(t.target===o)done();return}
+ if(o.userData.type==='poi'){const name=o.userData.name;if(name==='Logistikzentrum'){job='Lager & Lieferung';document.getElementById('jobChip').textContent='Beruf: '+job;setMoney(money+o.userData.reward);show(name,'Schicht beendet: +'+o.userData.reward+' €');if(t.poi===name)done()}else if(name==='Supermarkt'){if(money>=18){setMoney(money-18);show(name,'Lebensmittel gekauft: -18 €');if(t.poi===name)done()}else show(name,'Du brauchst mindestens 18 €.')}else if(name==='Autohaus'){show(name,'Hier kannst du später Autos kaufen und verkaufen.')}else if(name==='Bäckerei'){if(money>=6){setMoney(money-6);show(name,'Einkauf: -6 €')}else show(name,'Nicht genug Geld.')}else show(name,'Hier kannst du später arbeiten.');return}}
+function show(title,text){const p=document.getElementById('panel');document.getElementById('panelTitle').textContent=title;document.getElementById('panelBody').innerHTML='<div class="line">'+text+'</div>';p.style.display='block';clearTimeout(show.t);show.t=setTimeout(()=>p.style.display='none',3500)}
+updateTask();setMoney(0);
+const clock=new THREE.Clock();const dir=new THREE.Vector3(),right=new THREE.Vector3(),move=new THREE.Vector3();
+function walk(dt){if(!controls.isLocked)return;camera.getWorldDirection(dir);dir.y=0;dir.normalize();right.crossVectors(dir,new THREE.Vector3(0,1,0)).normalize();move.set(0,0,0);if(keys.KeyW)move.add(dir);if(keys.KeyS)move.sub(dir);if(keys.KeyD)move.add(right);if(keys.KeyA)move.sub(right);if(move.lengthSq()){move.normalize().multiplyScalar((age<3?1.8:age<8?3.4:5.3)*dt);camera.position.add(move);walked+=move.length();camera.position.y=age<2?1.0:age<6?1.25:age<13?1.45:1.7}const t=tasks[taskIndex];if(t.walk&&walked>=t.walk)done();if(t.pos&&camera.position.distanceTo(t.pos)<5)done();if(t.money&&money>=t.money)done()}
+function drive(dt){const a=keys.KeyW?16:(keys.KeyS?-12:0);carSpeed+=a*dt;carSpeed*=Math.pow(.985,dt*60);carSpeed=THREE.MathUtils.clamp(carSpeed,-10,31);const tar=(keys.KeyA?1:0)+(keys.KeyD?-1:0);steer=THREE.MathUtils.lerp(steer,tar,1-Math.pow(.001,dt));if(Math.abs(carSpeed)>.2)car.rotation.y+=steer*dt*(carSpeed/18)*1.35;dir.set(0,0,-1).applyQuaternion(car.quaternion);car.position.addScaledVector(dir,carSpeed*dt);const cam=car.position.clone().add(new THREE.Vector3(0,2.4,7.4).applyQuaternion(car.quaternion));camera.position.lerp(cam,1-Math.pow(.0001,dt));camera.lookAt(car.position.clone().add(new THREE.Vector3(0,1,0)))}
+function updateHint(){const n=nearest();const h=document.getElementById('hint');if(n.d<5.5){h.textContent='E · '+(n.o.userData.name||'interagieren');h.style.display='block'}else if(!controls.isLocked&&!driving){h.textContent='Klicke ins Spiel · WASD bewegen · E interagieren';h.style.display='block'}else h.style.display='none'}
+function animate(){requestAnimationFrame(animate);const dt=Math.min(clock.getDelta(),.04);driving?drive(dt):walk(dt);updateHint();renderer.render(scene,camera)}animate();addEventListener('resize',()=>{camera.aspect=innerWidth/innerHeight;camera.updateProjectionMatrix();renderer.setSize(innerWidth,innerHeight)});
 </script>
-</body>
-</html>
+</body></html>

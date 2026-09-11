@@ -1,28 +1,20 @@
-REAL LIFE SIMULATOR – PROTOTYPE 01
+LIFE SIMULATOR – PROTOTYPE 02
 
-Was schon drin ist:
-- frei durch eine kleine 3D-Stadt laufen
-- Auto betreten/verlassen
-- Auto fahren mit Beschleunigung, Bremsen und Lenken
-- NPC-Verkehr
-- Tag/Nacht-Umschaltung
-- Regen-Umschaltung
-- Minimap
-- Straßen, Gebäude, Gehwege, Laternen, Bäume
-- dynamische Beleuchtung und Nebel
+1. index.html direkt in dein GitHub-Repository hochladen.
+2. Vercel mit diesem Repository verbinden.
+3. Framework: Other, Root Directory: ./, keine Build Command nötig.
 
 Steuerung:
-WASD = bewegen/fahren
-Shift = schneller laufen
-E = ins Auto / aus dem Auto
-R = Regen an/aus
-N = Tag/Nacht
-Maus = Blickrichtung
+- Maus: Kamera
+- WASD: bewegen / fahren
+- E: interagieren / Auto ein- oder aussteigen
 
-Start:
-1. Ordner entpacken.
-2. index.html in einem modernen Browser öffnen.
-3. Internetverbindung wird benötigt, weil die 3D-Engine Three.js geladen wird.
-
-Hinweis:
-Das ist bewusst PROTOTYPE 01: eine technische Spielbasis, noch keine fertige fotorealistische AAA-Welt.
+Neu in V2:
+- Start als Baby
+- Mutter und Vater
+- Alters-/Lebensphasen
+- Aufgaben
+- Jobs und Geld
+- Supermarkt, Bäckerei, Autohaus, Krankenhaus, Werkstatt
+- Kaufen/Arbeiten als erste Economy-Basis
+- i8-inspirierter Starterwagen (für echtes 1:1 wird ein richtiges 3D-Modell benötigt)
