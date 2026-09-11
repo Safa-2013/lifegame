@@ -1,90 +1,143 @@
 <!doctype html>
 <html lang="de">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Life Simulator – Prototype 02</title>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>YourLife – Prototype 03</title>
 <style>
-html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#0b0d10;font-family:Inter,system-ui,-apple-system,Segoe UI,sans-serif}canvas{display:block}
-#hud{position:fixed;inset:0;pointer-events:none;color:#fff}.glass{background:rgba(10,12,16,.62);border:1px solid rgba(255,255,255,.12);backdrop-filter:blur(14px);box-shadow:0 16px 50px rgba(0,0,0,.35)}
-#top{position:absolute;left:16px;top:16px;padding:12px 14px;border-radius:16px;min-width:290px}.kicker{font-size:11px;letter-spacing:.12em;text-transform:uppercase;opacity:.7}.big{font-size:18px;font-weight:800;margin-top:3px}.meta{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px}.chip{font-size:11px;padding:6px 8px;border-radius:9px;background:rgba(255,255,255,.07)}
-#task{position:absolute;left:16px;bottom:16px;padding:12px 14px;border-radius:16px;width:min(390px,calc(100vw - 32px))}.taskTitle{font-weight:800}.taskText{font-size:12px;opacity:.8;margin-top:5px;line-height:1.4}.progress{height:6px;background:rgba(255,255,255,.1);border-radius:99px;margin-top:9px;overflow:hidden}.bar{height:100%;width:0%;background:#fff}
-#hint{position:absolute;left:50%;bottom:55px;transform:translateX(-50%);padding:9px 12px;border-radius:12px;font-size:12px}.hide{display:none}
-#money{position:absolute;right:18px;bottom:18px;text-align:right}.money{font-size:27px;font-weight:800}.small{font-size:11px;opacity:.7}
-#stage{position:absolute;right:18px;top:18px;padding:10px 12px;border-radius:14px;text-align:right;min-width:150px}
-#panel{position:absolute;right:18px;top:105px;width:260px;border-radius:16px;padding:12px 14px;display:none;pointer-events:none}.panelTitle{font-weight:800;margin-bottom:7px}.line{font-size:12px;padding:6px 0;border-bottom:1px solid rgba(255,255,255,.08)}
-#reticle{position:absolute;left:50%;top:50%;width:5px;height:5px;border-radius:50%;background:#fff;transform:translate(-50%,-50%);opacity:.7}
-@media(max-width:700px){#top{min-width:220px}.big{font-size:15px}#stage{display:none}#panel{display:none!important}}
+:root{--glass:rgba(15,18,22,.72);--line:rgba(255,255,255,.12)}
+*{box-sizing:border-box}html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#0c0f13;font-family:Inter,system-ui,-apple-system,Segoe UI,sans-serif}canvas{display:block}
+#hud{position:fixed;inset:0;pointer-events:none;color:#fff}.glass{background:var(--glass);border:1px solid var(--line);backdrop-filter:blur(16px);box-shadow:0 18px 50px rgba(0,0,0,.34)}
+#top{position:absolute;left:18px;top:18px;padding:13px 15px;border-radius:16px;min-width:315px}.kicker{font-size:10px;letter-spacing:.15em;text-transform:uppercase;opacity:.68}.big{font-size:18px;font-weight:800;margin-top:3px}.meta{display:flex;gap:7px;flex-wrap:wrap;margin-top:9px}.chip{font-size:11px;padding:6px 8px;border-radius:9px;background:rgba(255,255,255,.07)}
+#stage{position:absolute;right:18px;top:18px;padding:10px 13px;border-radius:14px;text-align:right;min-width:150px}.small{font-size:10px;opacity:.66}.money{font-size:24px;font-weight:800}
+#task{position:absolute;left:18px;bottom:18px;width:min(430px,calc(100vw - 36px));padding:13px 15px;border-radius:16px}.taskTitle{font-size:15px;font-weight:800}.taskText{font-size:12px;opacity:.82;line-height:1.45;margin-top:5px}.progress{height:5px;border-radius:99px;background:rgba(255,255,255,.09);overflow:hidden;margin-top:10px}.bar{height:100%;width:0;background:#fff}
+#hint{position:absolute;left:50%;bottom:28px;transform:translateX(-50%);padding:9px 12px;border-radius:12px;font-size:12px;white-space:nowrap}
+#money{position:absolute;right:18px;bottom:18px;text-align:right}.hide{display:none!important}
+#dialog{position:absolute;left:50%;top:10%;transform:translateX(-50%);width:min(620px,calc(100vw - 36px));padding:14px 16px;border-radius:16px;display:none}.speaker{font-weight:800}.dialogText{font-size:13px;opacity:.85;margin-top:5px;line-height:1.5}
+#fade{position:absolute;inset:0;background:#000;opacity:0;transition:opacity 1s;pointer-events:none}
+#mini{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:min(480px,calc(100vw - 40px));padding:18px;border-radius:18px;display:none;pointer-events:auto;text-align:center}.miniTitle{font-size:20px;font-weight:900}.miniText{font-size:12px;opacity:.75;margin:6px 0 14px}.meter{height:28px;border-radius:14px;background:rgba(255,255,255,.09);position:relative;overflow:hidden}.target{position:absolute;left:42%;width:16%;top:0;bottom:0;background:rgba(255,255,255,.22)}.marker{position:absolute;top:3px;width:10px;height:22px;border-radius:6px;background:#fff;left:0}.miniBtn{margin-top:14px;font:inherit;font-weight:800;border:0;border-radius:11px;padding:10px 14px;background:#fff;color:#111;cursor:pointer}
+#reticle{position:absolute;left:50%;top:50%;width:5px;height:5px;border-radius:50%;background:#fff;opacity:.65;transform:translate(-50%,-50%)}
+@media(max-width:720px){#top{min-width:220px;max-width:72vw}.big{font-size:15px}#stage{display:none}#money{bottom:120px}.taskText{font-size:11px}}
 </style>
 </head>
 <body>
 <div id="hud">
-  <div id="top" class="glass"><div class="kicker">LIFE SIMULATOR · PROTOTYPE 02</div><div class="big" id="lifeTitle">Geburt · Zuhause</div><div class="meta"><div class="chip" id="ageChip">Alter: 0</div><div class="chip" id="jobChip">Beruf: –</div><div class="chip" id="homeChip">Zuhause: Elternhaus</div></div></div>
-  <div id="stage" class="glass"><div class="small">LEBENSPHASE</div><div class="big" id="stageName">Baby</div></div>
-  <div id="panel" class="glass"><div class="panelTitle" id="panelTitle">Info</div><div id="panelBody"></div></div>
-  <div id="task" class="glass"><div class="taskTitle" id="taskTitle">Deine erste Aufgabe</div><div class="taskText" id="taskText">Schau zu deiner Mutter und gehe näher zu ihr.</div><div class="progress"><div class="bar" id="taskBar"></div></div></div>
-  <div id="hint" class="glass">Klicke ins Spiel · WASD bewegen · E interagieren</div>
-  <div id="money"><div class="money" id="moneyText">0,00 €</div><div class="small">KONTO</div></div>
-  <div id="reticle"></div>
+  <div id="top" class="glass"><div class="kicker">YOURLIFE · PROTOTYPE 03</div><div id="lifeTitle" class="big">Geburt · Krankenhaus</div><div class="meta"><div class="chip" id="ageChip">Alter: 0 Tage</div><div class="chip" id="familyChip">Familie: Mama & Papa</div><div class="chip" id="homeChip">Zuhause: –</div></div></div>
+  <div id="stage" class="glass"><div class="small">LEBENSPHASE</div><div class="big" id="stageName">Neugeboren</div></div>
+  <div id="task" class="glass"><div class="taskTitle" id="taskTitle">Du kommst auf die Welt</div><div class="taskText" id="taskText">Du bist im Krankenhaus im Arm deiner Mutter. Noch kannst du dich nicht selbst bewegen.</div><div class="progress"><div class="bar" id="taskBar"></div></div></div>
+  <div id="dialog" class="glass"><div class="speaker" id="speaker"></div><div class="dialogText" id="dialogText"></div></div>
+  <div id="hint" class="glass">Die ersten Minuten laufen automatisch ab.</div>
+  <div id="money"><div class="money" id="moneyText">0,00 €</div><div class="small">FAMILIENKONTO</div></div>
+  <div id="mini" class="glass"><div class="miniTitle">Erstes Wort</div><div class="miniText">Drücke LEERTASTE oder den Knopf, wenn der weiße Marker im hellen Bereich ist.</div><div class="meter"><div class="target"></div><div class="marker" id="marker"></div></div><button class="miniBtn" id="miniBtn">JETZT</button></div>
+  <div id="reticle" class="hide"></div><div id="fade"></div>
 </div>
-<script type="importmap">{"imports":{"three":"https://unpkg.com/three@0.168.0/build/three.module.js","three/addons/":"https://unpkg.com/three@0.168.0/examples/jsm/"}}</script>
+<script type="importmap">{"imports":{"three":"https://unpkg.com/three@0.168.0/build/three.module.js"}}</script>
 <script type="module">
 import * as THREE from 'three';
-import { PointerLockControls } from 'three/addons/controls/PointerLockControls.js';
-const scene=new THREE.Scene();scene.background=new THREE.Color(0xa9b7c1);scene.fog=new THREE.FogExp2(0xa9b7c1,.0022);
-const camera=new THREE.PerspectiveCamera(68,innerWidth/innerHeight,.08,1200);camera.position.set(0,1.1,5);
-const renderer=new THREE.WebGLRenderer({antialias:true,powerPreference:'high-performance'});renderer.setSize(innerWidth,innerHeight);renderer.setPixelRatio(Math.min(devicePixelRatio,2));renderer.shadowMap.enabled=true;renderer.shadowMap.type=THREE.PCFSoftShadowMap;renderer.toneMapping=THREE.ACESFilmicToneMapping;renderer.toneMappingExposure=1.1;renderer.outputColorSpace=THREE.SRGBColorSpace;document.body.appendChild(renderer.domElement);
-scene.add(new THREE.HemisphereLight(0xe8f0ff,0x5d564c,1.5));const sun=new THREE.DirectionalLight(0xfff3d9,3.5);sun.position.set(90,150,80);sun.castShadow=true;sun.shadow.mapSize.set(2048,2048);scene.add(sun);
+
+const scene=new THREE.Scene();scene.background=new THREE.Color(0xb7c2ca);scene.fog=new THREE.FogExp2(0xb7c2ca,.003);
+const camera=new THREE.PerspectiveCamera(60,innerWidth/innerHeight,.05,800);
+const renderer=new THREE.WebGLRenderer({antialias:true,powerPreference:'high-performance'});renderer.setSize(innerWidth,innerHeight);renderer.setPixelRatio(Math.min(devicePixelRatio,2));renderer.shadowMap.enabled=true;renderer.shadowMap.type=THREE.PCFSoftShadowMap;renderer.toneMapping=THREE.ACESFilmicToneMapping;renderer.toneMappingExposure=1.04;renderer.outputColorSpace=THREE.SRGBColorSpace;document.body.appendChild(renderer.domElement);
+scene.add(new THREE.HemisphereLight(0xf3f5f7,0x5b6066,1.5));const sun=new THREE.DirectionalLight(0xfff3df,2.4);sun.position.set(40,90,55);sun.castShadow=true;sun.shadow.mapSize.set(2048,2048);scene.add(sun);
 const world=new THREE.Group();scene.add(world);
-function mat(c,r=.8,m=0){return new THREE.MeshStandardMaterial({color:c,roughness:r,metalness:m})}function box(w,h,d,ma,x,y,z,grp=world){const o=new THREE.Mesh(new THREE.BoxGeometry(w,h,d),ma);o.position.set(x,y,z);o.castShadow=true;o.receiveShadow=true;grp.add(o);return o}
-const grass=mat(0x5d714e,1),asphalt=mat(0x2e3033,.93),side=mat(0x9c9d99,.95),wall=mat(0xd8d1c8,.95),roof=mat(0x42464a,.8),glass=new THREE.MeshPhysicalMaterial({color:0x7fa3b6,transparent:true,opacity:.55,roughness:.12,metalness:.15});
-const ground=new THREE.Mesh(new THREE.PlaneGeometry(700,700),grass);ground.rotation.x=-Math.PI/2;ground.receiveShadow=true;world.add(ground);
-for(let x=-160;x<=160;x+=80){box(16,.05,360,asphalt,x,.025,0);box(3,.13,360,side,x-9.5,.065,0);box(3,.13,360,side,x+9.5,.065,0)}for(let z=-160;z<=160;z+=80){box(360,.05,16,asphalt,0,.025,z);box(360,.13,3,side,0,.065,z-9.5);box(360,.13,3,side,0,.065,z+9.5)}
-function building(x,z,w,d,h,c){const g=new THREE.Group();box(w,h,d,mat(c,.88),0,h/2,0,g);for(let yy=3;yy<h-1;yy+=3.8)for(let xx=-w/2+2;xx<w/2-1;xx+=4){const win=new THREE.Mesh(new THREE.PlaneGeometry(1.5,1.8),glass);win.position.set(xx,yy,d/2+.01);g.add(win)}g.position.set(x,0,z);world.add(g);return g}
-for(let x=-120;x<=120;x+=80)for(let z=-120;z<=120;z+=80){if(Math.abs(x)<30&&Math.abs(z)<30)continue;building(x-18,z-18,25,25,15+Math.abs((x+z)%17),0x7c7a74);building(x+18,z+18,27,27,18+Math.abs((x-z)%15),0x8b847b)}
-// Elternhaus
-const home=new THREE.Group();box(22,7,18,wall,0,3.5,0,home);box(24,.7,20,roof,0,7.3,0,home);box(7,2.4,5,glass,0,2.2,9.01,home);box(2.2,3.2,.3,mat(0x5b4637,.7),-6,1.6,9.2,home);home.position.set(30,0,30);world.add(home);
-// Innenraum/Startzimmer angedeutet
-box(8,.5,4,mat(0xf3efe8,1),30,.25,23);box(2,.7,1.1,mat(0xffffff,.9),30,.65,22.4); // Bett/Wiege
-// Personen
-function person(x,z,shirt,name){const g=new THREE.Group();const skin=mat(0xd6a17d,.75);box(.75,1.55,.45,mat(shirt,.8),0,1.25,0,g);const head=new THREE.Mesh(new THREE.SphereGeometry(.32,20,16),skin);head.position.set(0,2.25,0);g.add(head);box(.2,1.1,.2,skin,-.55,1.3,0,g);box(.2,1.1,.2,skin,.55,1.3,0,g);box(.25,1.1,.25,mat(0x34383d,.8),-.22,.35,0,g);box(.25,1.1,.25,mat(0x34383d,.8),.22,.35,0,g);g.position.set(x,0,z);g.userData={type:'person',name};world.add(g);return g}
-const mother=person(27,25,0x8a5665,'Mutter');const father=person(34,25,0x445f7a,'Vater');
-// Shops + workplaces
-const points=[];function poi(name,type,x,z,reward=0){building(x,z,34,24,10,type==='shop'?0x5d6e64:type==='job'?0x646a78:0x7a6b5c);const sign=box(12,1,.35,mat(0xf1eee6,.6),x,6.2,z+12.25);sign.userData={type:'poi',name,kind:type,reward};points.push(sign);return sign}
-poi('Supermarkt','shop',-50,30);poi('Autohaus','shop',-50,-50);poi('Bäckerei','shop',30,-50);poi('Logistikzentrum','job',110,30,95);poi('Krankenhaus','job',110,-50,120);poi('Werkstatt','job',30,110,105);
-// Starter car – i8-inspired
-const car=new THREE.Group();const bodyMat=new THREE.MeshPhysicalMaterial({color:0x111417,metalness:.72,roughness:.18,clearcoat:1,clearcoatRoughness:.08});const accent=mat(0x18d5d0,.25,.45);const tire=mat(0x111111,.95),rim=mat(0x686d72,.28,.75);
-box(2.05,.48,4.45,bodyMat,0,.63,0,car);box(1.78,.42,2.4,bodyMat,0,.95,-.05,car);const wind=new THREE.Mesh(new THREE.BoxGeometry(1.55,.36,1.65),glass);wind.position.set(0,1.28,-.18);car.add(wind);box(2.0,.12,1.2,accent,0,.48,-1.45,car);box(.16,.16,3.25,accent,-.95,.54,.05,car);box(.16,.16,3.25,accent,.95,.54,.05,car);box(1.65,.08,.28,accent,0,.93,2.03,car);
-for(const sx of [-1,1])for(const sz of [-1.45,1.45]){const w=new THREE.Group();const t=new THREE.Mesh(new THREE.CylinderGeometry(.42,.42,.25,24),tire);t.rotation.z=Math.PI/2;w.add(t);const r=new THREE.Mesh(new THREE.CylinderGeometry(.23,.23,.27,12),rim);r.rotation.z=Math.PI/2;w.add(r);w.position.set(sx*.96,.42,sz);car.add(w)}
-car.position.set(39,0,32);car.userData={type:'car',name:'Starterwagen'};world.add(car);
-// systems
-const controls=new PointerLockControls(camera,renderer.domElement);renderer.domElement.onclick=()=>{if(!controls.isLocked&&!driving)controls.lock()};const keys={};addEventListener('keydown',e=>{keys[e.code]=true;if(e.code==='KeyE'&&!e.repeat)interact()});addEventListener('keyup',e=>keys[e.code]=false);
-let age=0,stage='Baby',money=0,job='–',homeName='Elternhaus',taskIndex=0,driving=false,carSpeed=0,steer=0;
-const tasks=[
- {t:'Schau zu deiner Mutter',d:'Gehe zu deiner Mutter und drücke E.',target:mother,age:0},
- {t:'Begrüße deinen Vater',d:'Gehe zu deinem Vater und drücke E.',target:father,age:1},
- {t:'Lerne laufen',d:'Bewege dich ein Stück durch das Haus.',walk:18,age:3},
- {t:'Erster Schultag',d:'Erreiche die markierte Straße vor dem Elternhaus.',pos:new THREE.Vector3(30,0,8),age:6},
- {t:'Erster Nebenjob',d:'Gehe zum Logistikzentrum und nimm einen Job an.',poi:'Logistikzentrum',age:16},
- {t:'Führerschein',d:'Gehe zu deinem Starterwagen und steige mit E ein.',target:car,age:18},
- {t:'Erster Einkauf',d:'Fahre oder gehe zum Supermarkt und kaufe Lebensmittel.',poi:'Supermarkt',age:18},
- {t:'Eigenes Geld',d:'Arbeite im Logistikzentrum. Eine Schicht zahlt 95 €.',poi:'Logistikzentrum',age:18},
- {t:'Eigene Wohnung',d:'Spare 1.200 € und kaufe später deine erste Wohnung.',money:1200,age:19}
-];let walked=0;
-function setAge(a){age=a;stage=a<2?'Baby':a<6?'Kleinkind':a<13?'Kind':a<18?'Jugendlich':'Erwachsen';document.getElementById('ageChip').textContent='Alter: '+a;document.getElementById('stageName').textContent=stage;document.getElementById('lifeTitle').textContent=(a<18?'Familie & Aufwachsen':'Eigenes Leben')+' · Stadt';}
-function setMoney(v){money=v;document.getElementById('moneyText').textContent=money.toLocaleString('de-DE',{minimumFractionDigits:2,maximumFractionDigits:2})+' €'}
-function updateTask(){const t=tasks[Math.min(taskIndex,tasks.length-1)];setAge(Math.max(age,t.age||age));document.getElementById('taskTitle').textContent=t.t;document.getElementById('taskText').textContent=t.d;document.getElementById('taskBar').style.width=((taskIndex/tasks.length)*100)+'%'}
-function done(){if(taskIndex<tasks.length-1){taskIndex++;updateTask()}else{document.getElementById('taskTitle').textContent='Freies Leben';document.getElementById('taskText').textContent='Arbeite, kaufe, verkaufe, fahre durch die Stadt und baue dein Leben aus.';document.getElementById('taskBar').style.width='100%'}}
-function nearest(){let all=[mother,father,car,...points],best=null,dist=999;for(const o of all){const d=camera.position.distanceTo(o.getWorldPosition(new THREE.Vector3()));if(d<dist){best=o;dist=d}}return {o:best,d:dist}}
-function interact(){const n=nearest();if(n.d>5.5)return;const o=n.o;const t=tasks[taskIndex];if(o===car){if(age<18){show('Auto','Du bist noch zu jung. Erst ab 18 kannst du fahren.');return}driving=!driving;if(driving){controls.unlock();show('Starterwagen','Motor gestartet · W/S Gas/Bremse · A/D lenken · E aussteigen');if(t.target===car)done()}else{camera.position.copy(car.position).add(new THREE.Vector3(3,1.7,0));show('Auto','Ausgestiegen.')}return}
- if(o.userData.type==='person'){show(o.userData.name,o===mother?'Sie kümmert sich um dich und begleitet dich beim Aufwachsen.':'Er unterstützt dich und gibt dir neue Aufgaben.');if(t.target===o)done();return}
- if(o.userData.type==='poi'){const name=o.userData.name;if(name==='Logistikzentrum'){job='Lager & Lieferung';document.getElementById('jobChip').textContent='Beruf: '+job;setMoney(money+o.userData.reward);show(name,'Schicht beendet: +'+o.userData.reward+' €');if(t.poi===name)done()}else if(name==='Supermarkt'){if(money>=18){setMoney(money-18);show(name,'Lebensmittel gekauft: -18 €');if(t.poi===name)done()}else show(name,'Du brauchst mindestens 18 €.')}else if(name==='Autohaus'){show(name,'Hier kannst du später Autos kaufen und verkaufen.')}else if(name==='Bäckerei'){if(money>=6){setMoney(money-6);show(name,'Einkauf: -6 €')}else show(name,'Nicht genug Geld.')}else show(name,'Hier kannst du später arbeiten.');return}}
-function show(title,text){const p=document.getElementById('panel');document.getElementById('panelTitle').textContent=title;document.getElementById('panelBody').innerHTML='<div class="line">'+text+'</div>';p.style.display='block';clearTimeout(show.t);show.t=setTimeout(()=>p.style.display='none',3500)}
-updateTask();setMoney(0);
-const clock=new THREE.Clock();const dir=new THREE.Vector3(),right=new THREE.Vector3(),move=new THREE.Vector3();
-function walk(dt){if(!controls.isLocked)return;camera.getWorldDirection(dir);dir.y=0;dir.normalize();right.crossVectors(dir,new THREE.Vector3(0,1,0)).normalize();move.set(0,0,0);if(keys.KeyW)move.add(dir);if(keys.KeyS)move.sub(dir);if(keys.KeyD)move.add(right);if(keys.KeyA)move.sub(right);if(move.lengthSq()){move.normalize().multiplyScalar((age<3?1.8:age<8?3.4:5.3)*dt);camera.position.add(move);walked+=move.length();camera.position.y=age<2?1.0:age<6?1.25:age<13?1.45:1.7}const t=tasks[taskIndex];if(t.walk&&walked>=t.walk)done();if(t.pos&&camera.position.distanceTo(t.pos)<5)done();if(t.money&&money>=t.money)done()}
-function drive(dt){const a=keys.KeyW?16:(keys.KeyS?-12:0);carSpeed+=a*dt;carSpeed*=Math.pow(.985,dt*60);carSpeed=THREE.MathUtils.clamp(carSpeed,-10,31);const tar=(keys.KeyA?1:0)+(keys.KeyD?-1:0);steer=THREE.MathUtils.lerp(steer,tar,1-Math.pow(.001,dt));if(Math.abs(carSpeed)>.2)car.rotation.y+=steer*dt*(carSpeed/18)*1.35;dir.set(0,0,-1).applyQuaternion(car.quaternion);car.position.addScaledVector(dir,carSpeed*dt);const cam=car.position.clone().add(new THREE.Vector3(0,2.4,7.4).applyQuaternion(car.quaternion));camera.position.lerp(cam,1-Math.pow(.0001,dt));camera.lookAt(car.position.clone().add(new THREE.Vector3(0,1,0)))}
-function updateHint(){const n=nearest();const h=document.getElementById('hint');if(n.d<5.5){h.textContent='E · '+(n.o.userData.name||'interagieren');h.style.display='block'}else if(!controls.isLocked&&!driving){h.textContent='Klicke ins Spiel · WASD bewegen · E interagieren';h.style.display='block'}else h.style.display='none'}
-function animate(){requestAnimationFrame(animate);const dt=Math.min(clock.getDelta(),.04);driving?drive(dt):walk(dt);updateHint();renderer.render(scene,camera)}animate();addEventListener('resize',()=>{camera.aspect=innerWidth/innerHeight;camera.updateProjectionMatrix();renderer.setSize(innerWidth,innerHeight)});
+const M=(c,r=.8,m=0)=>new THREE.MeshStandardMaterial({color:c,roughness:r,metalness:m});
+const glass=new THREE.MeshPhysicalMaterial({color:0x9fc3d5,transparent:true,opacity:.38,roughness:.08,metalness:.05});
+function box(w,h,d,mat,x,y,z,g=world){const o=new THREE.Mesh(new THREE.BoxGeometry(w,h,d),mat);o.position.set(x,y,z);o.castShadow=true;o.receiveShadow=true;g.add(o);return o}
+function sphere(r,mat,x,y,z,g=world){const o=new THREE.Mesh(new THREE.SphereGeometry(r,24,18),mat);o.position.set(x,y,z);o.castShadow=true;g.add(o);return o}
+
+// ---------- HOSPITAL ROOM ----------
+const hospital=new THREE.Group();world.add(hospital);
+box(12,.18,10,M(0xe8e7e2,1),0,0,0,hospital);box(12,4.5,.18,M(0xf0efeb,.95),0,2.25,-5,hospital);box(.18,4.5,10,M(0xf0efeb,.95),-6,2.25,0,hospital);box(.18,4.5,10,M(0xf0efeb,.95),6,2.25,0,hospital);
+box(4,.55,2.1,M(0xf7f7f5,.9),1.5,.55,-1,hospital);box(3.9,.3,1.9,M(0xffffff,.9),1.5,.97,-1,hospital);box(3.7,.2,1.0,M(0xb8d1db,.8),1.5,1.16,-1.5,hospital);
+box(1.4,.72,.52,M(0xffffff,.95),-3.8,1.05,-2.8,hospital);box(.9,.08,.35,M(0x222831,.4,.3),-3.8,1.48,-2.8,hospital);
+box(3.6,2.2,.12,glass,0,2.6,-4.9,hospital);box(.8,2.2,.14,M(0xd7d9da,.8),2.7,2.6,-4.88,hospital);
+
+function humanoid(name,shirt,pants,scale=1){const g=new THREE.Group();g.userData={name,type:'npc'};const skin=M(0xd2a07c,.78);box(.7*scale,1.25*scale,.42*scale,M(shirt,.82),0,1.35*scale,0,g);sphere(.30*scale,skin,0,2.18*scale,0,g);box(.18*scale,1.0*scale,.18*scale,skin,-.50*scale,1.35*scale,0,g);box(.18*scale,1.0*scale,.18*scale,skin,.50*scale,1.35*scale,0,g);box(.23*scale,1.05*scale,.25*scale,M(pants,.9),-.20*scale,.38*scale,0,g);box(.23*scale,1.05*scale,.25*scale,M(pants,.9),.20*scale,.38*scale,0,g);g.traverse(o=>{if(o.isMesh)o.castShadow=true});return g}
+const mother=humanoid('Mama',0x9b6c82,0x31363c);mother.position.set(1.8,0,-.6);hospital.add(mother);
+const father=humanoid('Papa',0x4b6579,0x30343a);father.position.set(3.8,0,1.6);hospital.add(father);
+const doctor=humanoid('Arzt',0xf2f4f5,0x51606d);doctor.position.set(-3.7,0,.4);hospital.add(doctor);
+const nurse=humanoid('Krankenschwester',0xe9eef0,0x6d7f8e);nurse.position.set(-2.2,0,2.3);hospital.add(nurse);
+
+// Baby, initially attached to mother arms
+const baby=new THREE.Group();baby.userData={type:'player'};const skin=M(0xd9aa88,.78);box(.43,.52,.28,M(0xf3eee8,.9),0,.27,0,baby);sphere(.22,skin,0,.72,0,baby);box(.10,.35,.10,skin,-.31,.28,0,baby);box(.10,.35,.10,skin,.31,.28,0,baby);baby.scale.setScalar(.9);mother.add(baby);baby.position.set(0,.95,.54);baby.rotation.x=-.15;
+
+camera.position.set(4.4,2.0,5.2);camera.lookAt(new THREE.Vector3(1.5,1.25,-.5));
+
+// ---------- HOME + CITY, hidden until arrival ----------
+const city=new THREE.Group();city.visible=false;world.add(city);city.position.set(0,0,0);
+const grass=M(0x64745b,1),asphalt=M(0x34383b,.95),side=M(0xa6a49c,.97),wall=M(0xd5d0c7,.96),roof=M(0x45484b,.86);
+const ground=new THREE.Mesh(new THREE.PlaneGeometry(500,500),grass);ground.rotation.x=-Math.PI/2;ground.receiveShadow=true;city.add(ground);
+for(let x=-120;x<=120;x+=80){box(14,.05,300,asphalt,x,.02,0,city);box(3,.12,300,side,x-8.5,.06,0,city);box(3,.12,300,side,x+8.5,.06,0,city)}for(let z=-120;z<=120;z+=80){box(300,.05,14,asphalt,0,.02,z,city);box(300,.12,3,side,0,.06,z-8.5,city);box(300,.12,3,side,0,.06,z+8.5,city)}
+function building(x,z,w,d,h,c){const g=new THREE.Group();box(w,h,d,M(c,.9),0,h/2,0,g);for(let yy=3;yy<h-1;yy+=3.5)for(let xx=-w/2+2;xx<w/2-1;xx+=3.6){const win=new THREE.Mesh(new THREE.PlaneGeometry(1.25,1.65),glass);win.position.set(xx,yy,d/2+.01);g.add(win)}g.position.set(x,0,z);city.add(g);return g}
+for(let x=-80;x<=80;x+=80)for(let z=-80;z<=80;z+=80){if(x===0&&z===0)continue;building(x-17,z-17,22,22,13+((x+z+300)%8),0x817f79);building(x+17,z+17,24,24,16+((x-z+300)%8),0x8d857d)}
+// Home exterior & nursery
+const home=new THREE.Group();city.add(home);home.position.set(28,0,28);box(22,7,18,wall,0,3.5,0,home);box(24,.7,20,roof,0,7.3,0,home);box(2.2,3.2,.3,M(0x5a4638,.76),-6,1.6,9.2,home);const hw=new THREE.Mesh(new THREE.PlaneGeometry(6,2.8),glass);hw.position.set(2.7,3.2,9.11);home.add(hw);
+const nursery=new THREE.Group();city.add(nursery);nursery.position.set(28,0,18);box(10,.15,9,M(0xd9d4cb,1),0,.075,0,nursery);box(10,3.2,.16,M(0xeeeae3,.98),0,1.6,-4.5,nursery);box(.16,3.2,9,M(0xeeeae3,.98),-5,1.6,0,nursery);box(.16,3.2,9,M(0xeeeae3,.98),5,1.6,0,nursery);
+box(2.1,.5,1.1,M(0xffffff,.9),-2.6,.5,-2.1,nursery);box(2.0,.22,1.0,M(0xb8d7e0,.9),-2.6,.86,-2.1,nursery);box(1.8,.48,1.0,M(0xcaa98d,.95),2.4,.24,-2.1,nursery);
+// toys
+const toy1=new THREE.Group();box(.48,.28,.48,M(0xd94f4f,.8),0,.14,0,toy1);sphere(.17,M(0xf3cb55,.75),0,.45,0,toy1);toy1.position.set(1.6,.1,.8);toy1.userData={type:'toy',name:'Rassel'};nursery.add(toy1);
+const toy2=new THREE.Group();sphere(.25,M(0x65a7d6,.75),0,.25,0,toy2);box(.15,.5,.15,M(0xf5cf6c,.78),0,.1,0,toy2);toy2.position.set(-.6,.1,1.7);toy2.userData={type:'toy',name:'Beißring'};nursery.add(toy2);
+
+// family and NPCs at home/city
+const homeMother=humanoid('Mama',0x9b6c82,0x31363c);homeMother.position.set(29,0,15);city.add(homeMother);
+const homeFather=humanoid('Papa',0x4b6579,0x30343a);homeFather.position.set(32,0,15.5);city.add(homeFather);
+function addNPC(name,role,x,z,shirt){const n=humanoid(name,shirt,0x34383d);n.position.set(x,0,z);n.userData.role=role;city.add(n);return n}
+addNPC('Polizist','Polizei',-42,18,0x243c5a);addNPC('Verkäuferin','Supermarkt',-48,31,0x598365);addNPC('Mechaniker','Werkstatt',24,-44,0x555a60);addNPC('Nachbar','Bewohner',42,38,0x8a6e55);
+
+// shops
+function poi(name,x,z,c){building(x,z,30,22,9,c);const s=box(12,.9,.3,M(0xf1eee8,.65),x,5.7,z+11.2,city);s.userData={type:'poi',name};return s}
+poi('Supermarkt',-48,28,0x65786c);poi('Krankenhaus',-48,-48,0x7d888f);poi('Autohaus',28,-48,0x626a76);poi('Bäckerei',108,28,0x8b765c);
+
+// family car, black + turquoise i8-inspired
+const familyCar=new THREE.Group();familyCar.userData={type:'car',name:'Familienwagen'};const bodyMat=new THREE.MeshPhysicalMaterial({color:0x0d1114,metalness:.78,roughness:.17,clearcoat:1,clearcoatRoughness:.06});const accent=M(0x16cfd0,.28,.45),tire=M(0x111111,.95),rim=M(0x747a80,.3,.75);
+box(2.05,.48,4.45,bodyMat,0,.62,0,familyCar);box(1.72,.42,2.35,bodyMat,0,.96,-.08,familyCar);const cw=new THREE.Mesh(new THREE.BoxGeometry(1.5,.36,1.6),glass);cw.position.set(0,1.28,-.18);familyCar.add(cw);box(.14,.14,3.25,accent,-.95,.52,.05,familyCar);box(.14,.14,3.25,accent,.95,.52,.05,familyCar);box(1.7,.09,.28,accent,0,.90,2.02,familyCar);for(const sx of [-1,1])for(const sz of [-1.45,1.45]){const w=new THREE.Group();const t=new THREE.Mesh(new THREE.CylinderGeometry(.42,.42,.25,24),tire);t.rotation.z=Math.PI/2;w.add(t);const r=new THREE.Mesh(new THREE.CylinderGeometry(.23,.23,.27,12),rim);r.rotation.z=Math.PI/2;w.add(r);w.position.set(sx*.96,.42,sz);familyCar.add(w)}familyCar.position.set(36,0,31);city.add(familyCar);
+
+// player / life state
+let phase='hospital',ageMonths=0,quest=0,canMove=false,heldToy=null,miniActive=false;const keys={};
+const player=new THREE.Group();player.visible=false;city.add(player);
+function rebuildPlayer(){player.clear();const s=ageMonths<18?.62:ageMonths<60?.78:1;const skin=M(0xd9aa88,.78);box(.62*s,.90*s,.34*s,M(0xece6df,.9),0,.72*s,0,player);sphere(.27*s,skin,0,1.45*s,0,player);box(.14*s,.72*s,.14*s,skin,-.42*s,.73*s,0,player);box(.14*s,.72*s,.14*s,skin,.42*s,.73*s,0,player);box(.18*s,.72*s,.18*s,M(0x6f7a82,.9),-.18*s,.2*s,0,player);box(.18*s,.72*s,.18*s,M(0x6f7a82,.9),.18*s,.2*s,0,player)}
+function setAge(m){ageMonths=m;let text=m<1?`${Math.round(m*30)} Tage`:m<24?`${m.toFixed(1).replace('.',',')} Jahre`.replace('1,5 Jahre','1,5 Jahre'):`${Math.floor(m/12)} Jahre`;if(m>0&&m<24) text=(m/12).toFixed(1).replace('.',',')+' Jahre';document.getElementById('ageChip').textContent='Alter: '+text;document.getElementById('stageName').textContent=m<2?'Neugeboren':m<12?'Baby':m<36?'Kleinkind':m<72?'Kindergarten':'Kind';rebuildPlayer()}
+function task(t,d,p){document.getElementById('taskTitle').textContent=t;document.getElementById('taskText').textContent=d;document.getElementById('taskBar').style.width=p+'%'}
+function dialog(who,text,ms=3000){const d=document.getElementById('dialog');document.getElementById('speaker').textContent=who;document.getElementById('dialogText').textContent=text;d.style.display='block';clearTimeout(dialog.to);dialog.to=setTimeout(()=>d.style.display='none',ms)}
+function fade(to,cb){const f=document.getElementById('fade');f.style.opacity=to;setTimeout(()=>{cb&&cb()},1050)}
+function hint(t){document.getElementById('hint').textContent=t}
+
+// Birth cutscene
+setTimeout(()=>dialog('Arzt','Alles sieht gut aus. Herzlichen Glückwunsch.',2600),600);
+setTimeout(()=>dialog('Mama','Hallo mein Schatz… Willkommen auf der Welt.',3000),3300);
+setTimeout(()=>{task('Nach Hause','Deine Mutter wird entlassen. Du kannst dich noch nicht selbst bewegen.',8);hint('Du wirst von deiner Mutter getragen.');},6200);
+setTimeout(()=>fade(1,()=>{
+  hospital.visible=false;city.visible=true;phase='carRide';world.remove(baby);homeMother.add(baby);baby.position.set(0,.95,.52);camera.position.set(34,2.2,36);camera.lookAt(new THREE.Vector3(28,1.3,18));document.getElementById('lifeTitle').textContent='Heimfahrt · mit Mama & Papa';task('Heimfahrt','Mama und Papa fahren mit dir vom Krankenhaus nach Hause.',14);fade(0);dialog('Papa','Wir fahren jetzt nach Hause. Dein Zimmer wartet schon.',3000);
+}),9300);
+setTimeout(()=>fade(1,()=>{
+  phase='home';homeMother.remove(baby);player.visible=true;player.position.set(28,0,18);canMove=true;camera.position.set(28,1.7,21.2);document.getElementById('lifeTitle').textContent='Zuhause · Kinderzimmer';document.getElementById('homeChip').textContent='Zuhause: Elternhaus';setAge(6);task('1. Quest · Entdecke dein Spielzeug','Krabbele zur roten Rassel und drücke E.',22);hint('WASD · bewegen   E · interagieren');fade(0);
+}),13300);
+
+const quests=[
+ {name:'Rassel nehmen',target:toy1,age:6,done:()=>{heldToy=toy1;toy1.visible=false;setAge(9);task('2. Quest · Zahnen','Nimm den Beißring mit E. Danach kannst du darauf kauen.',34);dialog('Mama','Du bekommst deinen ersten Zahn. Der Beißring hilft dir.',2600)}},
+ {name:'Beißring nehmen',target:toy2,age:9,done:()=>{heldToy=toy2;toy2.visible=false;setAge(12);task('2. Quest · Kauen','Drücke E noch einmal, um den Beißring in den Mund zu nehmen und darauf zu kauen.',43);dialog('Mama','Ganz vorsichtig… genau so.',2200)}},
+ {name:'Beißring kauen',special:'chew',age:12,done:()=>{setAge(18);task('3. Quest · Dein erstes Wort','Spiele das kleine Sprach-Mini-Spiel. Triff den hellen Bereich.',55);startMini()}},
+ {name:'Mama sagen',special:'mama',age:18,done:()=>{setAge(20);task('4. Quest · Zu Papa krabbeln','Gehe zu Papa und drücke E.',68);dialog('Mama','Du hast „Mama“ gesagt! Dein erstes Wort!',3600)}},
+ {name:'Papa',target:homeFather,age:20,done:()=>{setAge(24);task('5. Quest · Laufen lernen','Bewege dich 12 Meter durch das Zimmer und den Garten.',80);walkGoal=12;walked=0}},
+ {name:'Laufen',special:'walk',age:24,done:()=>{setAge(30);task('6. Quest · Nach draußen','Gehe mit Mama vor das Haus. Dort beginnt deine größere Welt.',92);dialog('Papa','Du läufst schon richtig gut!',2600)}},
+ {name:'Frei',target:homeMother,age:30,done:()=>{setAge(36);task('Nächste Lebensphase','Ab jetzt kommen Kindergarten, Schule, Freunde, Polizei, Läden, Jobs, Kaufen und Verkaufen Schritt für Schritt dazu.',100);dialog('Mama','Heute gehen wir zusammen nach draußen.',3000)}}
+];
+let qIndex=0,walkGoal=0,walked=0;
+function nearestInteractive(){const list=[toy1,toy2,homeMother,homeFather,familyCar,...city.children.filter(o=>o.userData&&o.userData.type==='npc')];let best=null,dist=999;for(const o of list){if(!o.visible)continue;const p=o.getWorldPosition(new THREE.Vector3());const d=player.position.distanceTo(p);if(d<dist){dist=d;best=o}}return {o:best,d:dist}}
+function interact(){if(!canMove||miniActive)return;const q=quests[qIndex];if(q.special==='chew'&&heldToy===toy2){dialog('Du','Du kaust auf dem Beißring. Dein erster Zahn wächst.',2600);q.done();qIndex++;return}const n=nearestInteractive();if(!n.o||n.d>2.3)return;if(q.target===n.o){q.done();qIndex++;return}if(n.o.userData?.type==='npc'||n.o===homeMother||n.o===homeFather){dialog(n.o.userData?.name||'Person',n.o===homeMother?'Mama passt auf dich auf.':n.o===homeFather?'Papa lächelt dich an.':`${n.o.userData.role||'Bewohner'} ist gerade unterwegs.`,2200)}}
+
+function startMini(){miniActive=true;canMove=false;document.getElementById('mini').style.display='block';hint('Triff den hellen Bereich.');}
+let markerX=0,markerDir=1;function tryMini(){if(!miniActive)return;if(markerX>=42&&markerX<=58){document.getElementById('mini').style.display='none';miniActive=false;canMove=true;quests[qIndex].done();qIndex++;}else{dialog('Mini-Spiel','Knapp daneben. Versuch es noch einmal.',1200)}}
+document.getElementById('miniBtn').onclick=tryMini;addEventListener('keydown',e=>{keys[e.code]=true;if(e.code==='KeyE'&&!e.repeat)interact();if(e.code==='Space'){e.preventDefault();tryMini()}});addEventListener('keyup',e=>keys[e.code]=false);
+
+// movement / visible third-person camera
+const clock=new THREE.Clock(),forward=new THREE.Vector3(),right=new THREE.Vector3();let yaw=0;
+renderer.domElement.addEventListener('click',()=>{if(canMove&&!miniActive)renderer.domElement.requestPointerLock?.()});
+addEventListener('mousemove',e=>{if(document.pointerLockElement===renderer.domElement&&canMove)yaw-=e.movementX*.0025});
+function movePlayer(dt){if(!canMove)return;forward.set(Math.sin(yaw),0,-Math.cos(yaw));right.set(Math.cos(yaw),0,Math.sin(yaw));const mv=new THREE.Vector3();if(keys.KeyW)mv.add(forward);if(keys.KeyS)mv.sub(forward);if(keys.KeyD)mv.add(right);if(keys.KeyA)mv.sub(right);if(mv.lengthSq()){mv.normalize();const speed=ageMonths<12?1.05:ageMonths<24?1.35:ageMonths<36?1.9:2.4;player.position.addScaledVector(mv,speed*dt);player.rotation.y=Math.atan2(mv.x,mv.z);walked+=speed*dt;if(quests[qIndex]?.special==='walk'&&walked>=walkGoal){quests[qIndex].done();qIndex++}}const h=ageMonths<12?.65:ageMonths<24?.8:1.05;const dist=ageMonths<12?2.4:3.0;const target=player.position.clone().add(new THREE.Vector3(0,h,0));const cam=target.clone().add(new THREE.Vector3(-Math.sin(yaw)*dist,1.35,Math.cos(yaw)*dist));camera.position.lerp(cam,1-Math.pow(.0008,dt));camera.lookAt(target)}
+function animateNPCs(t){for(const o of city.children){if(o.userData?.type==='npc'&&o!==homeMother&&o!==homeFather){o.position.y=Math.sin(t*2+o.position.x)*.015}}}
+function updateHint(){if(!canMove||miniActive)return;const n=nearestInteractive();if(n.o&&n.d<2.3)hint(`E · ${n.o.userData?.name||n.o.userData?.role||'interagieren'}`);else hint('WASD · bewegen   Maus · Kamera   E · interagieren')}
+function animate(){requestAnimationFrame(animate);const dt=Math.min(clock.getDelta(),.04),t=performance.now()/1000;if(miniActive){markerX+=markerDir*62*dt;if(markerX>97){markerX=97;markerDir=-1}if(markerX<0){markerX=0;markerDir=1}document.getElementById('marker').style.left=markerX+'%'}movePlayer(dt);animateNPCs(t);updateHint();renderer.render(scene,camera)}animate();
+addEventListener('resize',()=>{camera.aspect=innerWidth/innerHeight;camera.updateProjectionMatrix();renderer.setSize(innerWidth,innerHeight)});
 </script>
 </body></html>

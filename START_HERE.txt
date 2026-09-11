@@ -1,20 +1,20 @@
-LIFE SIMULATOR – PROTOTYPE 02
+YOURLIFE PROTOTYPE 03
 
-1. index.html direkt in dein GitHub-Repository hochladen.
-2. Vercel mit diesem Repository verbinden.
-3. Framework: Other, Root Directory: ./, keine Build Command nötig.
+1. Lade index.html direkt in dein GitHub-Repository hoch und ersetze die alte Datei.
+2. Commit changes.
+3. Vercel deployt automatisch neu.
 
-Steuerung:
-- Maus: Kamera
-- WASD: bewegen / fahren
-- E: interagieren / Auto ein- oder aussteigen
+Neu in V3:
+- Geburt im Krankenhaus im Arm der Mutter
+- Arzt, Krankenschwester, Vater
+- automatische Heimfahrt / keine Bewegung als Neugeborenes
+- sichtbarer eigener Charakter in Third Person
+- Baby-/Kleinkind-Größe passt sich an
+- Quest 1 Rassel nehmen
+- Quest 2 Beißring nehmen und kauen / erster Zahn
+- Quest 3 Mini-Spiel für erstes Wort "Mama"
+- weitere Altersquests: zu Papa, laufen lernen, rausgehen
+- Stadt-NPCs: Polizei, Verkäuferin, Mechaniker, Nachbar
+- Läden / Krankenhaus / Autohaus / Bäckerei als nächste Lebenswelt
 
-Neu in V2:
-- Start als Baby
-- Mutter und Vater
-- Alters-/Lebensphasen
-- Aufgaben
-- Jobs und Geld
-- Supermarkt, Bäckerei, Autohaus, Krankenhaus, Werkstatt
-- Kaufen/Arbeiten als erste Economy-Basis
-- i8-inspirierter Starterwagen (für echtes 1:1 wird ein richtiges 3D-Modell benötigt)
+Hinweis: Dies ist weiter ein Browser-Prototyp. Für fotorealistische Menschen, echte Fahrzeugmodelle, hochwertige Animationen und AAA-Physik braucht das Spiel später eine richtige 3D-Pipeline (z. B. Unreal Engine + 3D-Assets).
