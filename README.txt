@@ -1,12 +1,5 @@
-YourLife Prototype 06
+YOURLIFE Prototype 07
 
-Steuerung:
-WASD = bewegen
-Maus = weich gleitende Third-Person-Kamera
-Mausrad = Zoom
-E = einzige Interaktionstaste / Einsteigen / Aussteigen
-R = Entbuggen
-P = Handy
-ESC = Maus freigeben
+Neu: eigene Kita Sonnenweg, Ziel-Navigation mit Richtungspfeil und Entfernung, lesbare Gebäude-Schilder, mehr Straßen- und Umgebungsdetails, Kita-Spielplatz, Kinder-NPCs und korrigierte E-Interaktionen.
 
-In GitHub die alte index.html vollständig durch diese ersetzen und committen.
+GitHub: alte index.html durch diese ersetzen und committen.
