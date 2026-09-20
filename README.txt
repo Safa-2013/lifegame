@@ -1,12 +1,12 @@
-YourLife Prototype 05
+YourLife Prototype 06
 
 Steuerung:
-- Einmal ins Spielfenster klicken: Maus steuert Kamera frei
-- ESC: Maus freigeben
-- WASD: bewegen
-- Mausrad: Zoom
-- F: interagieren (E funktioniert ebenfalls)
-- R: sichere Position wiederherstellen
-- P: Handy
+WASD = bewegen
+Maus = weich gleitende Third-Person-Kamera
+Mausrad = Zoom
+E = einzige Interaktionstaste / Einsteigen / Aussteigen
+R = Entbuggen
+P = Handy
+ESC = Maus freigeben
 
-Für GitHub: alte index.html durch diese ersetzen und Commit changes drücken.
+In GitHub die alte index.html vollständig durch diese ersetzen und committen.
